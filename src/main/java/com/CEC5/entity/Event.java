@@ -26,7 +26,6 @@ public class Event {
     private Integer maxParticipants;
     private Integer fee;
     private Boolean isFirstComeFirstServe;
-    private String status;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
@@ -35,4 +34,11 @@ public class Event {
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
     private List<ParticipantForumMessage> participantForumMessageList;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<User> approvedParticipants;
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<User> participantsRequiringApproval;
 }

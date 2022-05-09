@@ -23,13 +23,13 @@ public class User {
     private Address address;
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
-
-
     private List<Event> createdEvents;
 
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
     private List<SignUpMessage> signUpMessageList;
 
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
     private List<ParticipantForumMessage> participantForumMessageList;
     private Integer reputationAsParticipant;

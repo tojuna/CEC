@@ -3,6 +3,7 @@ package com.CEC5.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -18,4 +19,7 @@ public class SignUpMessage {
     @ManyToOne(fetch = FetchType.LAZY)
     private Event event;
     private String imageUrl;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    List<SignUpMessage> replies;
 }
