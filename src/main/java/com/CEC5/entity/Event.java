@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -36,9 +37,9 @@ public class Event {
     private List<ParticipantForumMessage> participantForumMessageList;
 
     @OneToMany(fetch = FetchType.LAZY)
-    private List<User> approvedParticipants;
+    private Set<User> approvedParticipants;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
-    private List<User> participantsRequiringApproval;
+    private Set<User> participantsRequiringApproval;
 }

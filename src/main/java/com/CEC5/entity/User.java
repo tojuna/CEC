@@ -15,7 +15,7 @@ import java.util.List;
 public class User {
     @Id
     private String email;
-    private boolean organization;
+    private Boolean organization;
     private String fullName;
     private String screenName;
     private String gender;
@@ -32,6 +32,11 @@ public class User {
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
     private List<ParticipantForumMessage> participantForumMessageList;
-    private Integer reputationAsParticipant;
-    private Integer reputationAsOrganizer;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<ReviewsAsOrganizer> reviewsReceivedAsOrganizerList;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<ReviewsAsParticipants> reviewsReceivedAsParticipantList;
+
 }
