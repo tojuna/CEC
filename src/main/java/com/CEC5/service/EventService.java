@@ -30,13 +30,13 @@ public class EventService {
         BooleanExpression activeCheck = (status == null || status.equals("active") || status.equals("")) ?
                 (event.signUpDeadline.before(now).and(event.minParticipants
                         .gt(event.approvedParticipants.size().add(-1)))
-                        .and(event.endDateTime.lt(now))).or(event.signUpDeadline.after(now))
+                        .and(event.endDateTime.loe(now))).or(event.signUpDeadline.after(now))
                 : Expressions.TRUE;
         BooleanExpression openForRegistration = (!status.equals("open")) ? Expressions.TRUE:
                 event.signUpDeadline.after(now);
-        BooleanExpression start = (startTime == null) ? event.startDateTime.after(now):
+        BooleanExpression start = (startTime == null) ? event.startDateTime.goe(now):
                 event.startDateTime.after(startTime);
-        BooleanExpression end = (endTime == null) ? Expressions.TRUE: event.endDateTime.before(endTime);
+        BooleanExpression end = (endTime == null) ? Expressions.TRUE: event.endDateTime.loe(endTime);
         BooleanExpression titleMatch = (keyword == null) ? Expressions.TRUE: event.title.containsIgnoreCase(keyword);
         BooleanExpression descMatch = (keyword == null) ? Expressions.TRUE: event.description.containsIgnoreCase(keyword);
         BooleanExpression organizerMatch = (organizerName == null) ? Expressions.TRUE:
@@ -44,5 +44,35 @@ public class EventService {
         return (List<Event>) eventRepository.findAll(cityCheck.and(activeCheck)
                 .and(openForRegistration).and(start).and(end)
                 .and(titleMatch).and(descMatch).and(organizerMatch));
+    }
+
+    public List<Event> eventsToBeCancelled() {
+        QEvent event = QEvent.event;
+        LocalDateTime now = SystemDateTime.getCurrentDateTime();
+        BooleanExpression toCancel = event.signUpDeadline.before(now).and(event.minParticipants
+                .lt(event.approvedParticipants.size()))
+                .and(event.isCancelledAndEmailSent.eq(Boolean.FALSE));
+        return (List<Event>) eventRepository.findAll(toCancel);
+    }
+
+    public void cancelGivenEvents(List<Event> events) {
+        if (events == null || events.size() == 0) return;
+        for (Event event : events) {
+            event.setIsCancelledAndEmailSent(true);
+        }
+        eventRepository.saveAll(events);
+    }
+
+    public void setIsCancelledAndEmailSentToFalseGivenEvents() {
+        QEvent event = QEvent.event;
+        LocalDateTime now = SystemDateTime.getCurrentDateTime();
+        BooleanExpression toNotCancel = event.signUpDeadline.after(now)
+                .and(event.isCancelledAndEmailSent.eq(Boolean.TRUE));
+        List<Event> events = (List<Event>) eventRepository.findAll(toNotCancel);
+        if (events == null || events.size() == 0) return;
+        for (Event e : events) {
+            e.setIsCancelledAndEmailSent(false);
+        }
+        eventRepository.saveAll(events);
     }
 }

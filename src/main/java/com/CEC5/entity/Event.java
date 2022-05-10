@@ -27,14 +27,15 @@ public class Event {
     private Integer maxParticipants;
     private Integer fee;
     private Boolean isFirstComeFirstServe;
+    private Boolean isCancelledAndEmailSent;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
-    private List<SignUpMessage> signUpMessageList;
+    private List<Message> signUpMessageList;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
-    private List<ParticipantForumMessage> participantForumMessageList;
+    private List<Message> participantForumMessageList;
 
     @OneToMany(fetch = FetchType.LAZY)
     private Set<User> approvedParticipants;

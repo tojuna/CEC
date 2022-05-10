@@ -1,0 +1,14 @@
+package com.CEC5.jobs;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class UserInfoAndEventInfo {
+    private String userEmail;
+    private String userFullName;
+    private String organizerSceeenName;
+    private String eventTitle;
+    private Long eventId;
+}

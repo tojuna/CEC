@@ -27,11 +27,11 @@ public class User {
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
-    private List<SignUpMessage> signUpMessageList;
+    private List<Message> signUpMessageList;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
-    private List<ParticipantForumMessage> participantForumMessageList;
+    private List<Message> participantForumMessageList;
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<ReviewsAsOrganizer> reviewsReceivedAsOrganizerList;

@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Entity
-public class SignUpMessage {
+public class Message {
     @Id
     @GeneratedValue
     private Long messageId;
@@ -21,5 +21,5 @@ public class SignUpMessage {
     private String imageUrl;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    List<SignUpMessage> replies;
+    List<Message> replies;
 }
