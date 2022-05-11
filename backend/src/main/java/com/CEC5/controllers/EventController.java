@@ -7,9 +7,11 @@ import com.CEC5.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -40,13 +42,13 @@ public class EventController {
         return eventService.allEvents();
     }
 
-//    @GetMapping("/filter")
-//    public List<Event> filteredEvents(@RequestBody FilteredEventsStructure filteredEventsStructure) {
-//        return eventService.filteredEvents(filteredEventsStructure.getCity(),
-//                filteredEventsStructure.getStatus(),
-//                filteredEventsStructure.getStartTime(),
-//                filteredEventsStructure.getEndTime(),
-//                filteredEventsStructure.getKeyword(),
-//                filteredEventsStructure.getOrganizerName());
-//    }
+    @GetMapping("/filter")
+    public List<Event> filteredEvents(@RequestParam(value = "city", required = false) String city,
+                                      @RequestParam(value = "status", required = false) String status,
+                                      @RequestParam(value = "startTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
+                                      @RequestParam(value = "endTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
+                                      @RequestParam(value = "keyword", required = false) String keyword,
+                                      @RequestParam(value = "organizerName", required = false) String organizerName) {
+        return eventService.filteredEvents(city, status, startTime, endTime, keyword, organizerName);
+    }
 }
