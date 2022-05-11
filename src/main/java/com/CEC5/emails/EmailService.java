@@ -19,7 +19,7 @@ public class EmailService {
     private JavaMailSender javaMailSender;
 
     @Async
-    public void sendEmailAsynchronously(SimpleMailMessage message) {
+    void sendEmailAsynchronously(SimpleMailMessage message) {
         javaMailSender.send(message);
     }
 
@@ -51,7 +51,7 @@ public class EmailService {
         message.setTo(event.getOrganizer().getEmail());
         message.setSubject("Event Created: " + event.getTitle());
         message.setText("Hello " + event.getOrganizer().getFullName() +
-                ", a new event with event id: " + event.getEventId() +
+                ", a new event with event id: " + event.getEvent_id() +
                 " and title " + event.getTitle() + "has been created");
         sendEmailAsynchronously(message);
     }
@@ -62,7 +62,7 @@ public class EmailService {
         message.setSubject("Sign Up request approved for event: " + event.getTitle());
         message.setText("Hello " + user.getFullName() +
                 ", your sign up request for the event " + event.getTitle() +
-                " and event ID " + event.getEventId() + "has been approved");
+                " and event ID " + event.getEvent_id() + "has been approved");
         sendEmailAsynchronously(message);
     }
 
@@ -72,7 +72,7 @@ public class EmailService {
         message.setSubject("Sign Up request rejected for event: " + event.getTitle());
         message.setText("Hello " + user.getFullName() +
                 ", your sign up request for the event " + event.getTitle() +
-                " and event ID " + event.getEventId() + "has been rejected");
+                " and event ID " + event.getEvent_id() + "has been rejected");
         sendEmailAsynchronously(message);
     }
 
@@ -92,7 +92,7 @@ public class EmailService {
         m.setSubject("New message posted on event: " + message.getEvent().getTitle());
         m.setText("Hello " + message.getEvent().getOrganizer().getFullName() +
                 ", a new message has been posted on the event titled: " + message.getEvent().getTitle() +
-                " and Event No.: " + message.getEvent().getEventId() +
+                " and Event No.: " + message.getEvent().getEvent_id() +
                 " Message: " + message.getMessage());
         sendEmailAsynchronously(m);
     }

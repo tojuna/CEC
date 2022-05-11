@@ -18,6 +18,10 @@ public class EventService {
     @Autowired
     EventRepository eventRepository;
 
+    public Event saveEvent(Event event) {
+        return eventRepository.save(event);
+    }
+
     public List<Event> allEvents() {
         return eventRepository.findAll();
     }

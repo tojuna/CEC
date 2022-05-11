@@ -1,25 +1,20 @@
 package com.CEC5.entity;
-
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Entity
+@Table(name = "USER")
 public class User {
     @Id
     @NotEmpty
     private String email;
 
-    @JsonIgnore
     @NotNull
     private String password;
 
@@ -38,20 +33,11 @@ public class User {
     @NotEmpty
     private String description;
 
-//    @NotEmpty
+    @NotNull
     private Address address;
 
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Event> createdEvents;
-
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Message> signUpMessageList;
-
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Message> participantForumMessageList;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "organizer")
+    private List<Event> createdEvents = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<Reviews> reviewsReceivedAsOrganizerList;

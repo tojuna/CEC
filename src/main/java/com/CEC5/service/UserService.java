@@ -11,7 +11,15 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    public void saveUser(User user) {
-        userRepository.save(user);
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    public boolean isEmailPresent(String email) {
+        return userRepository.existsById(email);
+    }
+
+    public User findUser(String email) {
+        return userRepository.findById(email).orElse(null);
     }
 }

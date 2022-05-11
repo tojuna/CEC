@@ -40,7 +40,7 @@ public class CancelEvents {
                             user.getFullName(),
                             event.getOrganizer().getScreenName(),
                             event.getTitle(),
-                            event.getEventId()));
+                            event.getEvent_id()));
                 }
                 participants = event.getParticipantsRequiringApproval();
                 if (participants == null || participants.size() == 0) continue;
@@ -49,7 +49,7 @@ public class CancelEvents {
                             user.getFullName(),
                             event.getOrganizer().getScreenName(),
                             event.getTitle(),
-                            event.getEventId()));
+                            event.getEvent_id()));
                 }
             }
             emailService.eventCancelledEmail(userInfoAndEventInfoList);
