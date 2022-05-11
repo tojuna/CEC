@@ -36,7 +36,7 @@ public class User {
     @NotNull
     private Address address;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "organizer")
+    @OneToMany(mappedBy = "organizer")
     private List<Event> createdEvents = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY)

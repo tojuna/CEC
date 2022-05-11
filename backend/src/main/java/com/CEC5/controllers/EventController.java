@@ -2,8 +2,10 @@ package com.CEC5.controllers;
 
 import com.CEC5.emails.EmailService;
 import com.CEC5.entity.Event;
+import com.CEC5.entity.User;
 import com.CEC5.service.EventService;
 import com.CEC5.service.UserService;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,6 +36,7 @@ public class EventController {
     public Event createNewEvent(@Valid @RequestBody Event event) {
         LOGGER.info(event.toString());
         Event e = eventService.saveEvent(event);
+        e = eventService.findEventById(e.getEvent_id());
         emailService.eventCreated(e);
         return e;
     }
@@ -40,6 +44,11 @@ public class EventController {
     @GetMapping("/allEvents")
     public List<Event> allEvents() {
         return eventService.allEvents();
+    }
+
+    @GetMapping("/{id}")
+    public Event eventById(@PathVariable Long id) {
+        return eventService.findEventById(id);
     }
 
     @GetMapping("/filter")
@@ -50,5 +59,16 @@ public class EventController {
                                       @RequestParam(value = "keyword", required = false) String keyword,
                                       @RequestParam(value = "organizerName", required = false) String organizerName) {
         return eventService.filteredEvents(city, status, startTime, endTime, keyword, organizerName);
+    }
+
+    @PostMapping("/signUpForEvent")
+    public void signUp(@NotEmpty @RequestBody JsonNode requestBody) {
+        String email = requestBody.get("email").asText();
+        User user = userService.findUser(email);
+        Long eventId = requestBody.get("event_id").asLong();
+        Event event = eventService.findEventById(eventId);
+        if (event.getIsFirstComeFirstServe()) event.getApprovedParticipants().add(user);
+        else event.getParticipantsRequiringApproval().add(user);
+        eventService.saveEvent(event);
     }
 }

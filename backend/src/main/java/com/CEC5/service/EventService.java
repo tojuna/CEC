@@ -19,6 +19,10 @@ public class EventService {
     @Autowired
     EventRepository eventRepository;
 
+    public Event findEventById(Long id) {
+        return eventRepository.findById(id).orElse(null);
+    }
+
     public Event saveEvent(Event event) {
         return eventRepository.save(event);
     }

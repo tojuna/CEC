@@ -41,7 +41,7 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());
         message.setSubject("Welcome to CEC " + user.getScreenName());
-        message.setText("Hello " + user.getFullName() + ", new account has been created for the email"
+        message.setText("Hello " + user.getFullName() + ", new account has been created for the email "
                 + user.getEmail());
         sendEmailAsynchronously(message);
     }
@@ -50,9 +50,8 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(event.getOrganizer().getEmail());
         message.setSubject("Event Created: " + event.getTitle());
-        message.setText("Hello " + event.getOrganizer().getFullName() +
-                ", a new event with event id: " + event.getEvent_id() +
-                " and title " + event.getTitle() + "has been created");
+        message.setText("Hello, a new event with event id: " + event.getEvent_id() +
+                " and title " + event.getTitle() + " has been created");
         sendEmailAsynchronously(message);
     }
 
