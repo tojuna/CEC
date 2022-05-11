@@ -34,9 +34,9 @@ public class User {
     private List<Message> participantForumMessageList;
 
     @OneToMany(fetch = FetchType.LAZY)
-    private List<ReviewsAsOrganizer> reviewsReceivedAsOrganizerList;
+    private List<Reviews> reviewsReceivedAsOrganizerList;
 
     @OneToMany(fetch = FetchType.LAZY)
-    private List<ReviewsAsParticipants> reviewsReceivedAsParticipantList;
+    private List<Reviews> reviewsReceivedAsParticipantList;
 
 }

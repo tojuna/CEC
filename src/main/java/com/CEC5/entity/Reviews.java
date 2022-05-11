@@ -1,13 +1,12 @@
 package com.CEC5.entity;
 
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import lombok.Data;
 
 import javax.persistence.*;
 
 @Data
 @Entity
-public class ReviewsAsParticipants {
+public class Reviews {
     @Id
     @GeneratedValue
     private Long id;

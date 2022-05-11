@@ -1,4 +1,4 @@
-package com.CEC5.jobs;
+package com.CEC5;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,5 +1,7 @@
 package com.CEC5.jobs;
 
+import com.CEC5.UserInfoAndEventInfo;
+import com.CEC5.emails.EmailService;
 import com.CEC5.entity.Event;
 import com.CEC5.entity.User;
 import com.CEC5.service.EventService;
@@ -21,6 +23,9 @@ public class CancelEvents {
     @Autowired
     EventService eventService;
 
+    @Autowired
+    EmailService emailService;
+
     @Scheduled(cron = "0 0/1 * * * ?")
     void cancelEventsJob() {
         LOGGER.info("Hello");
@@ -37,7 +42,17 @@ public class CancelEvents {
                             event.getTitle(),
                             event.getEventId()));
                 }
+                participants = event.getParticipantsRequiringApproval();
+                if (participants == null || participants.size() == 0) continue;
+                for (User user: participants) {
+                    userInfoAndEventInfoList.add(new UserInfoAndEventInfo(user.getEmail(),
+                            user.getFullName(),
+                            event.getOrganizer().getScreenName(),
+                            event.getTitle(),
+                            event.getEventId()));
+                }
             }
+            emailService.eventCancelledEmail(userInfoAndEventInfoList);
         }
         eventService.cancelGivenEvents(eventsList);
     }

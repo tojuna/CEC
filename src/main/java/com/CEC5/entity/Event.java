@@ -17,6 +17,7 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User organizer;
+
     private String title;
     private String description;
     private LocalDateTime startDateTime;
