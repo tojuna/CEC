@@ -26,7 +26,7 @@ public class CancelEvents {
     @Autowired
     EmailService emailService;
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+//    @Scheduled(cron = "0 0/1 * * * ?")
     void cancelEventsJob() {
         LOGGER.info("Hello");
         List<Event> eventsList = eventService.eventsToBeCancelled();
@@ -57,7 +57,7 @@ public class CancelEvents {
         eventService.cancelGivenEvents(eventsList);
     }
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+//    @Scheduled(cron = "0 0/1 * * * ?")
     void setIsCancelledAndEmailSentToFalse() {
         eventService.setIsCancelledAndEmailSentToFalseGivenEvents();
     }
