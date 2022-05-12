@@ -71,4 +71,9 @@ public class EventController {
         else event.getParticipantsRequiringApproval().add(user);
         eventService.saveEvent(event);
     }
+
+    @GetMapping("/keyword")
+    public List<String> keywordSearch(@RequestBody JsonNode jsonNode) {
+        return eventService.search(jsonNode.get("keyword").asText());
+    }
 }

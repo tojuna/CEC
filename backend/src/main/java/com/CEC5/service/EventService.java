@@ -81,4 +81,8 @@ public class EventService {
         }
         eventRepository.saveAll(events);
     }
+
+    public List<String> search(String keyword) {
+        return eventRepository.search(keyword);
+    }
 }
