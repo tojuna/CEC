@@ -33,10 +33,11 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public void login(@NotEmpty @RequestBody JsonNode requestBody) {
+    public User login(@NotEmpty @RequestBody JsonNode requestBody) {
         User u = userService.findUser(requestBody.get("email").asText());
         if (u == null || !u.getPassword().equals(requestBody.get("password").asText()))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong email or password");
+        return u;
     }
 
     @PostMapping("/newUser")

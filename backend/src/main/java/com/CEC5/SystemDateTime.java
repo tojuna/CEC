@@ -11,7 +11,7 @@ public class SystemDateTime {
         return LocalDateTime.now().plusDays(addedDays).plusMonths(addedMonths).plusYears(addedYears);
     }
 
-    public void setCurrentDateTime(Long days, Long months, Long years) {
+    public static void setCurrentDateTime(Long days, Long months, Long years) {
         addedDays = (days == null) ? 0: days;
         addedMonths = (months == null) ? 0: months;
         addedYears = (years == null) ? 0: years;
