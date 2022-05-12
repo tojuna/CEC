@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 
 @RestController
@@ -54,11 +56,15 @@ public class EventController {
     @GetMapping("/filter")
     public List<Event> filteredEvents(@RequestParam(value = "city", required = false) String city,
                                       @RequestParam(value = "status", required = false) String status,
-                                      @RequestParam(value = "startTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-                                      @RequestParam(value = "endTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
+                                      @RequestParam(value = "startTime", required = false)  String startTime,
+                                      @RequestParam(value = "endTime", required = false) String endTime,
                                       @RequestParam(value = "keyword", required = false) String keyword,
                                       @RequestParam(value = "organizerName", required = false) String organizerName) {
-        return eventService.filteredEvents(city, status, startTime, endTime, keyword, organizerName);
+        LocalDateTime st = LocalDateTime.parse(startTime);
+        LocalDateTime en = LocalDateTime.parse(endTime);
+        LOGGER.info(st.toString());
+        LOGGER.info(en.toString());
+        return eventService.filteredEvents(city, status, st, en, keyword, organizerName);
     }
 
     @PostMapping("/signUpForEvent")

@@ -32,7 +32,7 @@ public class UserController {
         return userService.findUser(email);
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public User login(@NotEmpty @RequestBody JsonNode requestBody) {
         User u = userService.findUser(requestBody.get("email").asText());
         if (u == null || !u.getPassword().equals(requestBody.get("password").asText()))
