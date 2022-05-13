@@ -91,20 +91,20 @@ public class EventController {
     }
 
     @PostMapping("/approveUserForEvent")
-    public Event approveUserForEvent(@NotEmpty @RequestBody JsonNode requestBody) {
+    public User approveUserForEvent(@NotEmpty @RequestBody JsonNode requestBody) {
         String userToBeApprovedEmail = requestBody.get("userToBeApprovedEmail").asText();
         String userWhoIsTryingToApproveEmail = requestBody.get("userWhoIsTryingToApproveEmail").asText();
         Long eventId = requestBody.get("event_id").asLong();
-        User approver = userService.findUser(userWhoIsTryingToApproveEmail);
-        User toBeApproved = userService.findUser(userToBeApprovedEmail);
-        if (toBeApproved.getOrganization())
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization can't register for event");
         Event event = eventService.findEventById(eventId);
+        User toBeApproved = userService.findUser(userToBeApprovedEmail);
+        if (toBeApproved.getOrganization() && event.getOrganizer().getEmail() != userWhoIsTryingToApproveEmail)
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization can't register for event or wrong user");
         if (event.getApprovedParticipants().size() < event.getMaxParticipants()
                 && event.getParticipantsRequiringApproval().contains(toBeApproved)) {
             event.getApprovedParticipants().add(toBeApproved);
         }
         else throw new ResponseStatusException(HttpStatus.CONFLICT, "Something went wrong");
-        return eventService.saveEvent(event);
+        eventService.saveEvent(event);
+        return userService.findUser(userWhoIsTryingToApproveEmail);
     }
 }
