@@ -39,7 +39,7 @@ public class EventService {
         if (city != null) where.and(event.address.city.equalsIgnoreCase(city));
         if (status == null || status.equals("active") || status.equals(""))
                 where.and((event.signUpDeadline.before(now).and(event.minParticipants
-                        .goe(event.approvedParticipants.size()))
+                        .loe(event.approvedParticipants.size()))
                         .and(event.endDateTime.loe(now))).or(event.signUpDeadline.goe(now)));
         if (status != null && status.equals("open")) where.and(event.signUpDeadline.goe(now));
         if (startTime != null) where.and(event.startDateTime.goe(now));
