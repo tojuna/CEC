@@ -105,6 +105,24 @@ public class EventController {
         }
         else throw new ResponseStatusException(HttpStatus.CONFLICT, "Something went wrong");
         eventService.saveEvent(event);
+        emailService.participationSignUpRequestApproved(event, toBeApproved);
         return userService.findUser(userWhoIsTryingToApproveEmail);
+    }
+
+    @PostMapping("/rejectUserForEvent")
+    public User rejectUser(@NotEmpty @RequestBody JsonNode requestBody) {
+        String userToBeRejectedEmail = requestBody.get("userToBeRejectedEmail").asText();
+        String userWhoIsTryingToRejectEmail = requestBody.get("userWhoIsTryingToRejectEmail").asText();
+        Long eventId = requestBody.get("event_id").asLong();
+        Event event = eventService.findEventById(eventId);
+        User toBeRejected = userService.findUser(userToBeRejectedEmail);
+        if (event.getOrganizer().getEmail() != userWhoIsTryingToRejectEmail)
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Given user can't reject");
+        if (event.getParticipantsRequiringApproval().contains(toBeRejected))
+            event.getParticipantsRequiringApproval().remove(toBeRejected);
+        else throw new ResponseStatusException(HttpStatus.CONFLICT, "Something went wrong");
+        eventService.saveEvent(event);
+        emailService.participationSignUpRequestRejected(event, toBeRejected);
+        return userService.findUser(userWhoIsTryingToRejectEmail);
     }
 }

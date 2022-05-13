@@ -27,7 +27,7 @@ public class CancelEvents {
     EmailService emailService;
 
 //    @Scheduled(cron = "0 0/1 * * * ?")
-    void cancelEventsJob() {
+    public void cancelEventsJob() {
         LOGGER.info("Hello");
         List<Event> eventsList = eventService.eventsToBeCancelled();
         if (eventsList != null && eventsList.size() > 0) {
@@ -58,7 +58,7 @@ public class CancelEvents {
     }
 
 //    @Scheduled(cron = "0 0/1 * * * ?")
-    void setIsCancelledAndEmailSentToFalse() {
+    public void setIsCancelledAndEmailSentToFalse() {
         eventService.setIsCancelledAndEmailSentToFalseGivenEvents();
     }
 }
