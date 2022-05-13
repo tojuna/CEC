@@ -54,7 +54,7 @@ public class EventService {
         QEvent event = QEvent.event;
         LocalDateTime now = SystemDateTime.getCurrentDateTime();
         BooleanExpression toCancel = event.signUpDeadline.before(now).and(event.minParticipants
-                .lt(event.approvedParticipants.size()))
+                .gt(event.approvedParticipants.size()))
                 .and(event.isCancelledAndEmailSent.eq(Boolean.FALSE));
         return (List<Event>) eventRepository.findAll(toCancel);
     }
