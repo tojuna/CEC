@@ -33,21 +33,19 @@ public class EventService {
 
     public List<Event> filteredEvents(String city, String status, LocalDateTime startTime,
                                       LocalDateTime endTime, String keyword, String organizerName) {
-        if (status != null && status.equals("all")) return allEvents();
         QEvent event = QEvent.event;
         LocalDateTime now = SystemDateTime.getCurrentDateTime();
         BooleanBuilder where = new BooleanBuilder();
-        if (city != null) where.and(event.address.city.eq(city));
+        if (city != null) where.and(event.address.city.equalsIgnoreCase(city));
         if (status == null || status.equals("active") || status.equals(""))
                 where.and((event.signUpDeadline.before(now).and(event.minParticipants
                         .goe(event.approvedParticipants.size()))
-                        .and(event.endDateTime.loe(now))).or(event.signUpDeadline.after(now)));
-        if (status != null && !status.equals("open")) where.and(event.signUpDeadline.after(now));
-        if (startTime == null) where.and(event.startDateTime.goe(now));
-        else where.and(event.startDateTime.goe(startTime));
+                        .and(event.endDateTime.loe(now))).or(event.signUpDeadline.goe(now)));
+        if (status != null && status.equals("open")) where.and(event.signUpDeadline.goe(now));
+        if (startTime != null) where.and(event.startDateTime.goe(now));
         if (endTime != null) where.and(event.endDateTime.loe(endTime));
-        if (keyword != null) where.and(event.title.containsIgnoreCase(keyword));
-        if (keyword != null) where.and(event.description.containsIgnoreCase(keyword));
+        if (keyword != null) where.and(event.title.containsIgnoreCase(keyword)
+                .or(event.description.containsIgnoreCase(keyword)));
         if (organizerName != null) where.and(event.organizer.screenName.containsIgnoreCase(organizerName));
         return (List<Event>) eventRepository.findAll(where);
     }

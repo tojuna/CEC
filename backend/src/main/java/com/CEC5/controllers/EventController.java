@@ -9,14 +9,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.List;
 
 @RestController
@@ -60,10 +57,16 @@ public class EventController {
                                       @RequestParam(value = "endTime", required = false) String endTime,
                                       @RequestParam(value = "keyword", required = false) String keyword,
                                       @RequestParam(value = "organizerName", required = false) String organizerName) {
-        LocalDateTime st = LocalDateTime.parse(startTime);
-        LocalDateTime en = LocalDateTime.parse(endTime);
-        LOGGER.info(st.toString());
-        LOGGER.info(en.toString());
+        if (city != null) LOGGER.info(city);
+        if (status != null) LOGGER.info(status);
+        if (startTime != null) LOGGER.info(startTime.toString());
+        if (endTime != null) LOGGER.info(endTime.toString());
+        if (keyword != null) LOGGER.info(keyword);
+        if (organizerName != null) LOGGER.info(organizerName);
+        LocalDateTime st = null;
+        if (startTime != null) st = LocalDateTime.parse(startTime);
+        LocalDateTime en = null;
+        if (endTime != null) en = LocalDateTime.parse(endTime);
         return eventService.filteredEvents(city, status, st, en, keyword, organizerName);
     }
 
