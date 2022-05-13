@@ -9,7 +9,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -71,18 +73,38 @@ public class EventController {
     }
 
     @PostMapping("/signUpForEvent")
-    public void signUp(@NotEmpty @RequestBody JsonNode requestBody) {
+    public Event signUp(@NotEmpty @RequestBody JsonNode requestBody) {
         String email = requestBody.get("email").asText();
         User user = userService.findUser(email);
         Long eventId = requestBody.get("event_id").asLong();
         Event event = eventService.findEventById(eventId);
+        if (event.getMaxParticipants() >= event.getApprovedParticipants().size())
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Max participants reached");
         if (event.getIsFirstComeFirstServe()) event.getApprovedParticipants().add(user);
         else event.getParticipantsRequiringApproval().add(user);
-        eventService.saveEvent(event);
+        return eventService.saveEvent(event);
     }
 
     @GetMapping("/keyword")
     public List<String> keywordSearch(@RequestBody JsonNode jsonNode) {
         return eventService.search(jsonNode.get("keyword").asText());
+    }
+
+    @PostMapping("/approveUserForEvent")
+    public Event approveUserForEvent(@NotEmpty @RequestBody JsonNode requestBody) {
+        String userToBeApprovedEmail = requestBody.get("userToBeApprovedEmail").asText();
+        String userWhoIsTryingToApproveEmail = requestBody.get("userWhoIsTryingToApproveEmail").asText();
+        Long eventId = requestBody.get("event_id").asLong();
+        User approver = userService.findUser(userWhoIsTryingToApproveEmail);
+        User toBeApproved = userService.findUser(userToBeApprovedEmail);
+        if (toBeApproved.getOrganization())
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization can't register for event");
+        Event event = eventService.findEventById(eventId);
+        if (event.getApprovedParticipants().size() < event.getMaxParticipants()
+                && event.getParticipantsRequiringApproval().contains(toBeApproved)) {
+            event.getApprovedParticipants().add(toBeApproved);
+        }
+        else throw new ResponseStatusException(HttpStatus.CONFLICT, "Something went wrong");
+        return eventService.saveEvent(event);
     }
 }
