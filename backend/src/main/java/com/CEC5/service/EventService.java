@@ -42,7 +42,7 @@ public class EventService {
                         .loe(event.approvedParticipants.size()))
                         .and(event.endDateTime.loe(now))).or(event.signUpDeadline.goe(now)));
         if (status != null && status.equals("open")) where.and(event.signUpDeadline.goe(now));
-        if (startTime != null) where.and(event.startDateTime.goe(now));
+        if (startTime != null) where.and(event.startDateTime.goe(startTime));
         if (endTime != null) where.and(event.endDateTime.loe(endTime));
         if (keyword != null) where.and(event.title.containsIgnoreCase(keyword)
                 .or(event.description.containsIgnoreCase(keyword)));
