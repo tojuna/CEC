@@ -1,5 +1,6 @@
 package com.CEC5.entity;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -18,10 +19,12 @@ public class SignUpForumMessage {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIncludeProperties({"email", "screenName"})
     private User messageCreator;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIncludeProperties({"event_id"})
     private Event event;
 
     private String imageUrl;
