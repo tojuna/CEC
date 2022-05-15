@@ -42,6 +42,10 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY)
     private List<Reviews> reviewsReceivedAsOrganizerList;
 
+    private Float reviewsReceivedAsOrganizerAverage = 0F;
+
     @OneToMany(fetch = FetchType.LAZY)
     private List<Reviews> reviewsReceivedAsParticipantList;
+
+    private Float reviewsReceivedAsParticipantAverage = 0F;
 }

@@ -54,11 +54,11 @@ public class Event {
     @Column(columnDefinition = "boolean default false")
     private Boolean isCancelledAndEmailSent;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Message> signUpMessageList;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "event")
+    private List<SignUpForumMessage> signUpMessageList;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Message> participantForumMessageList;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "event")
+    private List<ParticipantForumMessage> participantForumMessageList;
 
     @OneToMany(fetch = FetchType.LAZY)
     private Set<User> approvedParticipants;

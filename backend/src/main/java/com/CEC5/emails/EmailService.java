@@ -1,10 +1,7 @@
 package com.CEC5.emails;
 
 import com.CEC5.UserInfoAndEventInfo;
-import com.CEC5.entity.Event;
-import com.CEC5.entity.Message;
-import com.CEC5.entity.Reviews;
-import com.CEC5.entity.User;
+import com.CEC5.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -85,14 +82,24 @@ public class EmailService {
         sendEmailAsynchronously(message);
     }
 
-    public void newMessageInForum(Message message) {
+    public void newMessageInForum(SignUpForumMessage signUpMessage) {
+        forumMessage(signUpMessage.getEvent(), signUpMessage.getMessage());
+    }
+
+    public void newMessageInForum(ParticipantForumMessage participantForumMessage) {
+        forumMessage(participantForumMessage.getEvent(), participantForumMessage.getMessage());
+    }
+
+    private void forumMessage(Event event, String message) {
         SimpleMailMessage m = new SimpleMailMessage();
-        m.setTo(message.getEvent().getOrganizer().getEmail());
-        m.setSubject("New message posted on event: " + message.getEvent().getTitle());
-        m.setText("Hello " + message.getEvent().getOrganizer().getFullName() +
-                ", a new message has been posted on the event titled: " + message.getEvent().getTitle() +
-                " and Event No.: " + message.getEvent().getEvent_id() +
-                " Message: " + message.getMessage());
+        m.setTo(event.getOrganizer().getEmail());
+        m.setSubject("New message posted on event: " + event.getTitle());
+        m.setText("Hello " + event.getOrganizer().getFullName() +
+                ", a new message has been posted on the event titled: " + event.getTitle() +
+                " and Event No.: " + event.getEvent_id() +
+                " Message: " + message);
         sendEmailAsynchronously(m);
     }
+
+
 }
