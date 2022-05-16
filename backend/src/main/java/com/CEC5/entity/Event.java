@@ -51,8 +51,8 @@ public class Event {
     @NotNull
     private Boolean isFirstComeFirstServe;
 
-    @Column(columnDefinition = "boolean default false")
-    private Boolean isCancelledAndEmailSent;
+    @Column
+    private Boolean isCancelledAndEmailSent = false;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "event")
     private List<SignUpForumMessage> signUpMessageList;
