@@ -82,12 +82,8 @@ public class EmailService {
         sendEmailAsynchronously(message);
     }
 
-    public void newMessageInForum(SignUpForumMessage signUpMessage) {
-        forumMessage(signUpMessage.getEvent(), signUpMessage.getMessage());
-    }
-
-    public void newMessageInForum(ParticipantForumMessage participantForumMessage) {
-        forumMessage(participantForumMessage.getEvent(), participantForumMessage.getMessage());
+    public void newMessageInForum(ForumMessage forumMessage) {
+        forumMessage(forumMessage.getEvent(), forumMessage.getMessage());
     }
 
     private void forumMessage(Event event, String message) {
@@ -100,6 +96,4 @@ public class EmailService {
                 " Message: " + message);
         sendEmailAsynchronously(m);
     }
-
-
 }

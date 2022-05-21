@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
-public class ParticipantForumMessage {
+public class ForumMessage {
     @Id
     @GeneratedValue
     private Long messageId;

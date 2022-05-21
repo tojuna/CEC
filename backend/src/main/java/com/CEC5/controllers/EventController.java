@@ -3,12 +3,10 @@ package com.CEC5.controllers;
 import com.CEC5.SystemDateTime;
 import com.CEC5.emails.EmailService;
 import com.CEC5.entity.Event;
-import com.CEC5.entity.ParticipantForumMessage;
-import com.CEC5.entity.SignUpForumMessage;
+import com.CEC5.entity.ForumMessage;
 import com.CEC5.entity.User;
 import com.CEC5.service.EventService;
-import com.CEC5.service.ParticipantForumMessageService;
-import com.CEC5.service.SignUpForumMessageService;
+import com.CEC5.service.ForumMessageService;
 import com.CEC5.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
@@ -39,16 +37,12 @@ public class EventController {
     UserService userService;
 
     @Autowired
-    ParticipantForumMessageService participantForumMessageService;
-
-    @Autowired
-    SignUpForumMessageService signUpForumMessageService;
+    ForumMessageService forumMessageService;
 
     @PostMapping("/createEvent")
     public Event createNewEvent(@Valid @RequestBody Event event) {
         LOGGER.info(event.toString());
         Event e = eventService.saveEvent(event);
-        e = eventService.findEventById(e.getEvent_id());
         emailService.eventCreated(e);
         return e;
     }
@@ -139,28 +133,36 @@ public class EventController {
     }
 
     @PostMapping("/participantForumMessage")
-    public Event participantForumMessage(@Valid @RequestBody ParticipantForumMessage participantForumMessage) {
-        Event event = participantForumMessage.getEvent();
-        User creator = userService.findUser(participantForumMessage.getMessageCreator().getEmail());
+    public Event participantForumMessage(@Valid @RequestBody ForumMessage forumMessage) {
+        Event event = forumMessage.getEvent();
+        User creator = userService.findUser(forumMessage.getMessageCreator().getEmail());
         event = eventService.findEventById(event.getEvent_id());
         if (event.getSignUpDeadline().compareTo(SystemDateTime.getCurrentDateTime()) > 0 ||
         event.getEndDateTime().plusDays(7).compareTo(SystemDateTime.getCurrentDateTime()) < 0)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Sign up deadline has not passed or event end + 7 days has passed");
         if (!event.getApprovedParticipants().contains(creator))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Creator not in approved participants");
-        participantForumMessageService.save(participantForumMessage);
-        emailService.newMessageInForum(participantForumMessage);
+        forumMessageService.save(forumMessage);
+        event.getParticipantForumMessageList().add(forumMessage);
+        eventService.saveEvent(event);
+        forumMessage.setEvent(event);
+        emailService.newMessageInForum(forumMessage);
         return eventService.findEventById(event.getEvent_id());
     }
 
     @PostMapping("/signUpForumMessage")
-    public Event signUpForumMessage(@Valid @RequestBody SignUpForumMessage signUpForumMessage) {
-        Event event = signUpForumMessage.getEvent();
+    public Event signUpForumMessage(@Valid @RequestBody ForumMessage forumMessage) {
+        Event event = forumMessage.getEvent();
         event = eventService.findEventById(event.getEvent_id());
         if (event.getSignUpDeadline().compareTo(SystemDateTime.getCurrentDateTime()) < 0)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Sign up deadline has passed");
-        signUpForumMessageService.save(signUpForumMessage);
-        emailService.newMessageInForum(signUpForumMessage);
+        forumMessageService.save(forumMessage);
+        event.getSignUpMessageList().add(forumMessage);
+        eventService.saveEvent(event);
+        forumMessage.setEvent(event);
+        emailService.newMessageInForum(forumMessage);
         return eventService.findEventById(event.getEvent_id());
     }
+
+
 }

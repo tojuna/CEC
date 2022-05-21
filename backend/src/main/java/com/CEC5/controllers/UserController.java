@@ -1,7 +1,11 @@
 package com.CEC5.controllers;
 
 import com.CEC5.emails.EmailService;
+import com.CEC5.entity.Event;
+import com.CEC5.entity.Reviews;
 import com.CEC5.entity.User;
+import com.CEC5.service.EventService;
+import com.CEC5.service.ReviewsService;
 import com.CEC5.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
@@ -24,7 +28,13 @@ public class UserController {
     UserService userService;
 
     @Autowired
+    EventService eventService;
+
+    @Autowired
     EmailService emailService;
+
+    @Autowired
+    ReviewsService reviewsService;
 
     @GetMapping
     public User getUser(@NotEmpty @RequestBody String email) {
@@ -47,5 +57,33 @@ public class UserController {
         User u = userService.saveUser(user);
         emailService.newUserCreated(u);
         return u;
+    }
+
+    @PostMapping("/review")
+    public User reviewUser(@Valid @RequestBody Reviews reviews) {
+        User reviewedUser = userService.findUser(reviews.getReviewedUser().getEmail());
+        User reviewedBy = userService.findUser(reviews.getReviewedBy().getEmail());
+        Event event = eventService.findEventById(reviews.getEvent().getEvent_id());
+        if (!event.getOrganizer().getEmail().equals(reviewedBy.getEmail())
+                && !event.getOrganizer().getEmail().equals(reviewedUser.getEmail()))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "One user has to be event organizer");
+        reviewsService.save(reviews);
+        int n = reviewedUser.getReviewsReceivedAsOrganizerList().size();
+        if (event.getOrganizer().getEmail().equals(reviewedUser.getEmail())) {
+            reviewedUser.getReviewsReceivedAsOrganizerList().add(reviews);
+            float avg = reviewedUser.getReviewsReceivedAsOrganizerAverage();
+            reviewedUser.setReviewsReceivedAsOrganizerAverage(((avg * n) + reviews.getRating()) / (n + 1));
+        }
+        else if (event.getOrganizer().getEmail().equals(reviewedBy.getEmail())) {
+            reviewedUser.getReviewsReceivedAsParticipantList().add(reviews);
+            float avg = reviewedUser.getReviewsReceivedAsParticipantAverage();
+            reviewedUser.setReviewsReceivedAsParticipantAverage(((avg * n) + reviews.getRating()) / (n + 1));
+        }
+        reviews.setReviewedUser(reviewedUser);
+        reviews.setReviewedBy(reviewedBy);
+        reviews.setEvent(event);
+        userService.saveUser(reviewedUser);
+        emailService.receivedReview(reviews);
+        return reviewedUser;
     }
 }
