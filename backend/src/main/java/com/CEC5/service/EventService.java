@@ -92,7 +92,7 @@ public class EventService {
         QEvent event = QEvent.event;
         BooleanExpression time = event.creationDateTime.goe(now.minusDays(90));
         List<Event> events = (List<Event>) eventRepository.findAll(time);
-        if (events == null || events.size() == 0) new Pair<>(0, 0);
+        if (events == null || events.size() == 0) return new Pair<>(0, 0.0F);
         int countOfPaid = 0;
         for (Event e: events) {
             if (e.getFee() > 0) countOfPaid++;
@@ -138,6 +138,20 @@ public class EventService {
         BooleanExpression condition = event.endDateTime.loe(now).and(event.endDateTime.goe(now.minusDays(90)))
                 .and(event.isCancelledAndEmailSent.eq(Boolean.FALSE)).and(event.approvedParticipants.contains(u));
         return eventRepository.count(condition);
+    }
+
+    public Pair<Integer, Float> numberOfCreatedEventsByUser(User u) {
+        LocalDateTime now = SystemDateTime.getCurrentDateTime();
+        QEvent event = QEvent.event;
+        BooleanExpression condition = event.creationDateTime.goe(now.minusDays(90))
+                .and(event.organizer.email.eq(u.getEmail()));
+        List<Event> events = (List<Event>) eventRepository.findAll(condition);
+        if (events == null || events.size() == 0) return new Pair<>(0, 0.0F);
+        int countOfPaid = 0;
+        for (Event e: events) {
+            if (e.getFee() > 0) countOfPaid++;
+        }
+        return new Pair<>(events.size(), (float)countOfPaid / events.size());
     }
 
 }

@@ -6,6 +6,7 @@ import com.CEC5.entity.Reviews;
 import com.CEC5.entity.User;
 import com.CEC5.service.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mysema.commons.lang.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,9 +105,14 @@ public class UserController {
         return res;
     }
 
-//    @GetMapping("/organizerReport")
-//    public Map<String, String> organizerReport(@RequestBody JsonNode jsonNode) {
-//        String email = jsonNode.get("email").asText();
-//
-//    }
+    @GetMapping("/organizerReport")
+    public Map<String, String> organizerReport(@RequestBody JsonNode jsonNode) {
+        String email = jsonNode.get("email").asText();
+        User u = userService.findUser(email);
+        Map<String, String> res = new HashMap<>();
+        Pair<Integer, Float> numberOfCreatedEventsByUser = eventService.numberOfCreatedEventsByUser(u);
+        res.put("numberOfCreatedEventsByUser", numberOfCreatedEventsByUser.getFirst().toString());
+        res.put("percentageOfPaidEvents", numberOfCreatedEventsByUser.getSecond().toString());
+        return res;
+    }
 }
