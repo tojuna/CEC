@@ -2,12 +2,8 @@ package com.CEC5.controllers;
 
 import com.CEC5.SystemDateTime;
 import com.CEC5.emails.EmailService;
-import com.CEC5.entity.Event;
-import com.CEC5.entity.ForumMessage;
-import com.CEC5.entity.User;
-import com.CEC5.service.EventService;
-import com.CEC5.service.ForumMessageService;
-import com.CEC5.service.UserService;
+import com.CEC5.entity.*;
+import com.CEC5.service.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +35,16 @@ public class EventController {
     @Autowired
     ForumMessageService forumMessageService;
 
+    @Autowired
+    SignUpEventService signUpEventService;
+
+    @Autowired
+    RejectOrApprovalForEventService rejectOrApprovalForEventService;
+
     @PostMapping("/createEvent")
     public Event createNewEvent(@Valid @RequestBody Event event) {
         LOGGER.info(event.toString());
+        event.setCreationDateTime(SystemDateTime.getCurrentDateTime());
         Event e = eventService.saveEvent(event);
         emailService.eventCreated(e);
         return e;
@@ -83,10 +86,12 @@ public class EventController {
         User user = userService.findUser(email);
         Long eventId = requestBody.get("event_id").asLong();
         Event event = eventService.findEventById(eventId);
-        if (event.getMaxParticipants() >= event.getApprovedParticipants().size())
+        if (event.getMaxParticipants() < event.getApprovedParticipants().size())
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Max participants reached");
         if (event.getIsFirstComeFirstServe()) event.getApprovedParticipants().add(user);
         else event.getParticipantsRequiringApproval().add(user);
+        SignUpEvent signUpEvent = new SignUpEvent(user, event, SystemDateTime.getCurrentDateTime());
+        signUpEventService.save(signUpEvent);
         return eventService.saveEvent(event);
     }
 
@@ -112,6 +117,11 @@ public class EventController {
         else throw new ResponseStatusException(HttpStatus.CONFLICT, "Something went wrong");
         eventService.saveEvent(event);
         emailService.participationSignUpRequestApproved(event, toBeApproved);
+        RejectOrApprovalForEvent rejectOrApprovalForEvent = new RejectOrApprovalForEvent(false,
+                SystemDateTime.getCurrentDateTime(),
+                toBeApproved,
+                event);
+        rejectOrApprovalForEventService.save(rejectOrApprovalForEvent);
         return userService.findUser(userWhoIsTryingToApproveEmail);
     }
 
@@ -163,6 +173,4 @@ public class EventController {
         emailService.newMessageInForum(forumMessage);
         return eventService.findEventById(event.getEvent_id());
     }
-
-
 }

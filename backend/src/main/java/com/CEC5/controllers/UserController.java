@@ -4,9 +4,7 @@ import com.CEC5.emails.EmailService;
 import com.CEC5.entity.Event;
 import com.CEC5.entity.Reviews;
 import com.CEC5.entity.User;
-import com.CEC5.service.EventService;
-import com.CEC5.service.ReviewsService;
-import com.CEC5.service.UserService;
+import com.CEC5.service.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +15,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/user")
@@ -35,6 +35,12 @@ public class UserController {
 
     @Autowired
     ReviewsService reviewsService;
+
+    @Autowired
+    SignUpEventService signUpEventService;
+
+    @Autowired
+    RejectOrApprovalForEventService rejectOrApprovalForEventService;
 
     @GetMapping
     public User getUser(@NotEmpty @RequestBody String email) {
@@ -86,4 +92,21 @@ public class UserController {
         emailService.receivedReview(reviews);
         return reviewedUser;
     }
+
+    @GetMapping("/userReport")
+    public Map<String, String> userReport(@RequestBody JsonNode jsonNode) {
+        String email = jsonNode.get("email").asText();
+        User u = userService.findUser(email);
+        Map<String, String> res = new HashMap<>();
+        res.put("numberOfSignedUpEvents", signUpEventService.numberOfSignedUpEvents(email).toString());
+        res.put("numberOfRejectsOrApprovals", rejectOrApprovalForEventService.numberOfRejectsOrApprovals(email).toString());
+        res.put("numberOfFinishedEventsWhereUserHasParticipated", eventService.numberOfFinishedEventsWhereUserHasParticipated(u).toString());
+        return res;
+    }
+
+//    @GetMapping("/organizerReport")
+//    public Map<String, String> organizerReport(@RequestBody JsonNode jsonNode) {
+//        String email = jsonNode.get("email").asText();
+//
+//    }
 }

@@ -51,8 +51,9 @@ public class Event {
     @NotNull
     private Boolean isFirstComeFirstServe;
 
-    @Column
     private Boolean isCancelledAndEmailSent = false;
+
+    private LocalDateTime creationDateTime;
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<ForumMessage> signUpMessageList;
@@ -60,9 +61,9 @@ public class Event {
     @OneToMany(fetch = FetchType.LAZY)
     private List<ForumMessage> participantForumMessageList;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private Set<User> approvedParticipants;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     private Set<User> participantsRequiringApproval;
 }

@@ -1,12 +1,12 @@
 package com.CEC5.service;
 
 import com.CEC5.SystemDateTime;
-import com.CEC5.entity.Event;
-import com.CEC5.entity.QEvent;
+import com.CEC5.entity.*;
 import com.CEC5.repository.EventRepository;
+import com.CEC5.repository.SignUpEventRepository;
+import com.mysema.commons.lang.Pair;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +18,9 @@ public class EventService {
 
     @Autowired
     EventRepository eventRepository;
+
+    @Autowired
+    SignUpEventRepository signUpEventRepository;
 
     public Event findEventById(Long id) {
         return eventRepository.findById(id).orElse(null);
@@ -83,4 +86,58 @@ public class EventService {
     public List<String> search(String keyword) {
         return eventRepository.search(keyword);
     }
+
+    public Pair<Integer, Float> numberOfCreatedEvents() {
+        LocalDateTime now = SystemDateTime.getCurrentDateTime();
+        QEvent event = QEvent.event;
+        BooleanExpression time = event.creationDateTime.goe(now.minusDays(90));
+        List<Event> events = (List<Event>) eventRepository.findAll(time);
+        if (events == null || events.size() == 0) new Pair<>(0, 0);
+        int countOfPaid = 0;
+        for (Event e: events) {
+            if (e.getFee() > 0) countOfPaid++;
+        }
+        return new Pair<>(events.size(), (float)countOfPaid / events.size());
+    }
+
+    public Pair<Integer, Float> cancelledEvents() {
+        LocalDateTime now = SystemDateTime.getCurrentDateTime();
+        QEvent event = QEvent.event;
+        BooleanExpression condition = event.signUpDeadline.goe(now.minusDays(90))
+                .and(event.isCancelledAndEmailSent.eq(Boolean.TRUE));
+        List<Event> events = (List<Event>) eventRepository.findAll(condition);
+        int totalParticipationRequests = 0;
+        int totalMinimumParticipants = 0;
+        for (Event e: events) {
+            QSignUpEvent sign = QSignUpEvent.signUpEvent;
+            BooleanExpression c = sign.event.event_id.eq(e.getEvent_id());
+            Long count = signUpEventRepository.count(c);
+            totalParticipationRequests += count;
+            totalMinimumParticipants += e.getMinParticipants();
+        }
+        return new Pair<>(events.size(), (float)totalParticipationRequests / totalMinimumParticipants);
+    }
+
+    public Pair<Integer, Float> finishedEvents() {
+        LocalDateTime now = SystemDateTime.getCurrentDateTime();
+        QEvent event = QEvent.event;
+        BooleanExpression condition = event.endDateTime.loe(now).and(event.endDateTime.goe(now.minusDays(90)))
+                .and(event.isCancelledAndEmailSent.eq(Boolean.FALSE));
+        List<Event> events = (List<Event>) eventRepository.findAll(condition);
+        if (events.size() == 0) new Pair<>(0, 0.0F);
+        int tot = 0;
+        for (Event e: events) {
+            tot += e.getApprovedParticipants().size();
+        }
+        return new Pair<>(tot, (float)tot / events.size());
+    }
+
+    public Long numberOfFinishedEventsWhereUserHasParticipated(User u) {
+        LocalDateTime now = SystemDateTime.getCurrentDateTime();
+        QEvent event = QEvent.event;
+        BooleanExpression condition = event.endDateTime.loe(now).and(event.endDateTime.goe(now.minusDays(90)))
+                .and(event.isCancelledAndEmailSent.eq(Boolean.FALSE)).and(event.approvedParticipants.contains(u));
+        return eventRepository.count(condition);
+    }
+
 }
