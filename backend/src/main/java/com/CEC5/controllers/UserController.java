@@ -43,8 +43,9 @@ public class UserController {
     @Autowired
     RejectOrApprovalForEventService rejectOrApprovalForEventService;
 
-    @GetMapping
-    public User getUser(@NotEmpty @RequestBody String email) {
+    @PostMapping
+    public User getUser(@NotEmpty @RequestBody JsonNode requestBody) {
+        String email = requestBody.get("email").asText();
         LOGGER.info(email);
         return userService.findUser(email);
     }
