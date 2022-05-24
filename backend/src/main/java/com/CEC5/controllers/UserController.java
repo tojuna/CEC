@@ -113,6 +113,15 @@ public class UserController {
         Pair<Integer, Float> numberOfCreatedEventsByUser = eventService.numberOfCreatedEventsByUser(u);
         res.put("numberOfCreatedEventsByUser", numberOfCreatedEventsByUser.getFirst().toString());
         res.put("percentageOfPaidEvents", numberOfCreatedEventsByUser.getSecond().toString());
+        Pair<Integer, Float> numberOfCancelledEventsByUser = eventService.numberOfCancelledEventsByUser(u);
+        res.put("numberOfCancelledEventsByUser", numberOfCancelledEventsByUser.getFirst().toString());
+        res.put("numberOfParticipationRequestsDividedByTheTotalNumberOfMinimumParticipants", numberOfCancelledEventsByUser.getSecond().toString());
+        Pair<Integer, Float> finishedEvents = eventService.finishedEvents(u);
+        res.put("numberOfFinishedEvents", finishedEvents.getFirst().toString());
+        res.put("averageNumberOfParticipantsOfTheseEvents", finishedEvents.getSecond().toString());
+        Pair<Integer, Integer> numberOfPaidEventsFinished = eventService.numberOfPaidEventsFinished(u);
+        res.put("numberOfPaidEventsFinished", numberOfPaidEventsFinished.getFirst().toString());
+        res.put("totalRevenueFromPaidEvents", numberOfPaidEventsFinished.getSecond().toString());
         return res;
     }
 }

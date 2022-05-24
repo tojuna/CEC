@@ -9,7 +9,6 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -97,7 +96,7 @@ public class EventService {
         for (Event e: events) {
             if (e.getFee() > 0) countOfPaid++;
         }
-        return new Pair<>(events.size(), (float)countOfPaid / events.size());
+        return new Pair<>(events.size(), (float)countOfPaid * 100 / events.size());
     }
 
     public Pair<Integer, Float> cancelledEvents() {
@@ -115,7 +114,7 @@ public class EventService {
             totalParticipationRequests += count;
             totalMinimumParticipants += e.getMinParticipants();
         }
-        return new Pair<>(events.size(), (float)totalParticipationRequests / totalMinimumParticipants);
+        return new Pair<>(events.size(), (float)totalParticipationRequests * 100 / totalMinimumParticipants);
     }
 
     public Pair<Integer, Float> finishedEvents() {
@@ -129,7 +128,7 @@ public class EventService {
         for (Event e: events) {
             tot += e.getApprovedParticipants().size();
         }
-        return new Pair<>(tot, (float)tot / events.size());
+        return new Pair<>(tot, (float)tot * 100 / events.size());
     }
 
     public Long numberOfFinishedEventsWhereUserHasParticipated(User u) {
@@ -151,7 +150,53 @@ public class EventService {
         for (Event e: events) {
             if (e.getFee() > 0) countOfPaid++;
         }
-        return new Pair<>(events.size(), (float)countOfPaid / events.size());
+        return new Pair<>(events.size(), (float)countOfPaid * 100 / events.size());
+    }
+
+    public Pair<Integer, Float> numberOfCancelledEventsByUser(User u) {
+        LocalDateTime now = SystemDateTime.getCurrentDateTime();
+        QEvent event = QEvent.event;
+        BooleanExpression condition = event.signUpDeadline.goe(now.minusDays(90))
+                .and(event.organizer.email.eq(u.getEmail())).and(event.isCancelledAndEmailSent.eq(Boolean.TRUE));
+        List<Event> events = (List<Event>) eventRepository.findAll(condition);
+        int totalParticipationRequests = 0;
+        int totalMinimumParticipants = 0;
+        for (Event e: events) {
+            QSignUpEvent sign = QSignUpEvent.signUpEvent;
+            BooleanExpression c = sign.event.event_id.eq(e.getEvent_id());
+            Long count = signUpEventRepository.count(c);
+            totalParticipationRequests += count;
+            totalMinimumParticipants += e.getMinParticipants();
+        }
+        return new Pair<>(events.size(), (float)totalParticipationRequests * 100 / totalMinimumParticipants);
+    }
+
+    public Pair<Integer, Float> finishedEvents(User u) {
+        LocalDateTime now = SystemDateTime.getCurrentDateTime();
+        QEvent event = QEvent.event;
+        BooleanExpression condition = event.endDateTime.loe(now).and(event.endDateTime.goe(now.minusDays(90)))
+                .and(event.isCancelledAndEmailSent.eq(Boolean.FALSE)).and(event.organizer.email.eq(u.getEmail()));
+        List<Event> events = (List<Event>) eventRepository.findAll(condition);
+        if (events.size() == 0) new Pair<>(0, 0.0F);
+        int tot = 0;
+        for (Event e: events) {
+            tot += e.getApprovedParticipants().size();
+        }
+        return new Pair<>(tot, (float)tot * 100 / events.size());
+    }
+
+    public Pair<Integer, Integer> numberOfPaidEventsFinished(User u) {
+        LocalDateTime now = SystemDateTime.getCurrentDateTime();
+        QEvent event = QEvent.event;
+        BooleanExpression condition = event.endDateTime.loe(now).and(event.endDateTime.goe(now.minusDays(90)))
+                .and(event.isCancelledAndEmailSent.eq(Boolean.FALSE)).and(event.organizer.email.eq(u.getEmail()))
+                .and(event.fee.gt(0));
+        List<Event> events = (List<Event>) eventRepository.findAll(condition);
+        int revenue = 0;
+        for (Event e: events) {
+            revenue += e.getFee() * e.getApprovedParticipants().size();
+        }
+        return new Pair<>(events.size(), revenue);
     }
 
 }
