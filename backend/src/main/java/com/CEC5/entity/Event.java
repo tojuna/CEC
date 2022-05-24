@@ -55,6 +55,8 @@ public class Event {
 
     private LocalDateTime creationDateTime;
 
+    private Boolean participantForumClosedByOrganizer = false;
+
     @OneToMany(fetch = FetchType.LAZY)
     private List<ForumMessage> signUpMessageList;
 

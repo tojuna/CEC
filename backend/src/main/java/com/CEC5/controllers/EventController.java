@@ -173,4 +173,15 @@ public class EventController {
         emailService.newMessageInForum(forumMessage);
         return eventService.findEventById(event.getEvent_id());
     }
+
+    @PostMapping("/closeParticipantForum")
+    public Event closeParticipantForum(@Valid @RequestBody JsonNode jsonNode) {
+        String email = jsonNode.get("email").asText();
+        Long event_id = jsonNode.get("event_id").asLong();
+        Event event = eventService.findEventById(event_id);
+        if (!event.getOrganizer().getEmail().equals(email))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Only organizer can close");
+        event.setParticipantForumClosedByOrganizer(true);
+        return eventService.saveEvent(event);
+    }
 }
