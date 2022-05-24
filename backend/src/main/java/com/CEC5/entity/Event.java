@@ -18,7 +18,7 @@ public class Event {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIncludeProperties({"email", "screenName"})
+    @JsonIncludeProperties({"email","screenName","reviewsReceivedAsOrganizerAverage","reviewsReceivedAsParticipantAverage"})
     private User organizer;
 
     @NotNull

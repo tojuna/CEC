@@ -107,7 +107,7 @@ public class EventController {
         Long eventId = requestBody.get("event_id").asLong();
         Event event = eventService.findEventById(eventId);
         User toBeApproved = userService.findUser(userToBeApprovedEmail);
-        if (toBeApproved.getOrganization() && event.getOrganizer().getEmail() != userWhoIsTryingToApproveEmail)
+        if (toBeApproved.getOrganization() && !event.getOrganizer().getEmail().equals(userWhoIsTryingToApproveEmail))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization can't register for event or wrong user");
         if (event.getApprovedParticipants().size() < event.getMaxParticipants()
                 && event.getParticipantsRequiringApproval().contains(toBeApproved)) {
@@ -132,7 +132,7 @@ public class EventController {
         Long eventId = requestBody.get("event_id").asLong();
         Event event = eventService.findEventById(eventId);
         User toBeRejected = userService.findUser(userToBeRejectedEmail);
-        if (event.getOrganizer().getEmail() != userWhoIsTryingToRejectEmail)
+        if (!event.getOrganizer().getEmail().equals(userWhoIsTryingToRejectEmail))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Given user can't reject");
         if (event.getParticipantsRequiringApproval().contains(toBeRejected))
             event.getParticipantsRequiringApproval().remove(toBeRejected);

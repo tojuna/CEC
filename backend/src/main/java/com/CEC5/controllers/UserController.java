@@ -76,13 +76,14 @@ public class UserController {
                 && !event.getOrganizer().getEmail().equals(reviewedUser.getEmail()))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "One user has to be event organizer");
         reviewsService.save(reviews);
-        int n = reviewedUser.getReviewsReceivedAsOrganizerList().size();
         if (event.getOrganizer().getEmail().equals(reviewedUser.getEmail())) {
+            int n = reviewedUser.getReviewsReceivedAsOrganizerList().size();
             reviewedUser.getReviewsReceivedAsOrganizerList().add(reviews);
             float avg = reviewedUser.getReviewsReceivedAsOrganizerAverage();
             reviewedUser.setReviewsReceivedAsOrganizerAverage(((avg * n) + reviews.getRating()) / (n + 1));
         }
         else if (event.getOrganizer().getEmail().equals(reviewedBy.getEmail())) {
+            int n = reviewedUser.getReviewsReceivedAsParticipantList().size();
             reviewedUser.getReviewsReceivedAsParticipantList().add(reviews);
             float avg = reviewedUser.getReviewsReceivedAsParticipantAverage();
             reviewedUser.setReviewsReceivedAsParticipantAverage(((avg * n) + reviews.getRating()) / (n + 1));
@@ -95,7 +96,7 @@ public class UserController {
         return reviewedUser;
     }
 
-    @GetMapping("/userReport")
+    @PostMapping("/userReport")
     public Map<String, String> userReport(@RequestBody JsonNode jsonNode) {
         String email = jsonNode.get("email").asText();
         User u = userService.findUser(email);
@@ -106,7 +107,7 @@ public class UserController {
         return res;
     }
 
-    @GetMapping("/organizerReport")
+    @PostMapping("/organizerReport")
     public Map<String, String> organizerReport(@RequestBody JsonNode jsonNode) {
         String email = jsonNode.get("email").asText();
         User u = userService.findUser(email);
