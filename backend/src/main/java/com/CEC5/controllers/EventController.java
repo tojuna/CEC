@@ -95,7 +95,7 @@ public class EventController {
         return eventService.saveEvent(event);
     }
 
-    @GetMapping("/keyword")
+    @PostMapping("/keyword")
     public List<String> keywordSearch(@RequestBody JsonNode jsonNode) {
         return eventService.search(jsonNode.get("keyword").asText());
     }
