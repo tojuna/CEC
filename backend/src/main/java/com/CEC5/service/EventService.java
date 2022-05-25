@@ -159,6 +159,7 @@ public class EventService {
         BooleanExpression condition = event.signUpDeadline.goe(now.minusDays(90))
                 .and(event.organizer.email.eq(u.getEmail())).and(event.isCancelledAndEmailSent.eq(Boolean.TRUE));
         List<Event> events = (List<Event>) eventRepository.findAll(condition);
+        if (events == null || events.size() == 0) return new Pair<>(0, 0.0F);
         int totalParticipationRequests = 0;
         int totalMinimumParticipants = 0;
         for (Event e: events) {
@@ -177,6 +178,7 @@ public class EventService {
         BooleanExpression condition = event.endDateTime.loe(now).and(event.endDateTime.goe(now.minusDays(90)))
                 .and(event.isCancelledAndEmailSent.eq(Boolean.FALSE)).and(event.organizer.email.eq(u.getEmail()));
         List<Event> events = (List<Event>) eventRepository.findAll(condition);
+        if (events == null || events.size() == 0) return new Pair<>(0, 0.0F);
         if (events.size() == 0) new Pair<>(0, 0.0F);
         int tot = 0;
         for (Event e: events) {
