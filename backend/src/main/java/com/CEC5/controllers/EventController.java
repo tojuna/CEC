@@ -92,6 +92,7 @@ public class EventController {
         else event.getParticipantsRequiringApproval().add(user);
         SignUpEvent signUpEvent = new SignUpEvent(user, event, SystemDateTime.getCurrentDateTime());
         signUpEventService.save(signUpEvent);
+        emailService.userHasSignedUpForEvent(event, user);
         return eventService.saveEvent(event);
     }
 
@@ -116,12 +117,12 @@ public class EventController {
         }
         else throw new ResponseStatusException(HttpStatus.CONFLICT, "Something went wrong");
         eventService.saveEvent(event);
-        emailService.participationSignUpRequestApproved(event, toBeApproved);
         RejectOrApprovalForEvent rejectOrApprovalForEvent = new RejectOrApprovalForEvent(false,
                 SystemDateTime.getCurrentDateTime(),
                 toBeApproved,
                 event);
         rejectOrApprovalForEventService.save(rejectOrApprovalForEvent);
+        emailService.participationSignUpRequestApproved(event, toBeApproved);
         return userService.findUser(userWhoIsTryingToApproveEmail);
     }
 

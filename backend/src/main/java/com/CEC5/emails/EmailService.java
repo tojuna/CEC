@@ -96,4 +96,14 @@ public class EmailService {
                 " Message: " + message);
         sendEmailAsynchronously(m);
     }
+
+    public void userHasSignedUpForEvent(Event event, User u) {
+        SimpleMailMessage m = new SimpleMailMessage();
+        m.setTo(u.getEmail());
+        m.setSubject("Sign up request received");
+        m.setText("Hello " + u.getFullName() +
+                ", your sign up request has been received for the event id " + event.getTitle());
+        sendEmailAsynchronously(m);
+    }
+
 }
