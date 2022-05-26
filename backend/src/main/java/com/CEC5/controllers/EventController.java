@@ -151,8 +151,8 @@ public class EventController {
         if (event.getSignUpDeadline().compareTo(SystemDateTime.getCurrentDateTime()) > 0 ||
         event.getEndDateTime().plusDays(7).compareTo(SystemDateTime.getCurrentDateTime()) < 0)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Sign up deadline has not passed or event end + 7 days has passed");
-        if (!event.getApprovedParticipants().contains(creator))
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Creator not in approved participants");
+//        if (!event.getApprovedParticipants().contains(creator))
+//            throw new ResponseStatusException(HttpStatus.CONFLICT, "Creator not in approved participants");
         forumMessageService.save(forumMessage);
         event.getParticipantForumMessageList().add(forumMessage);
         eventService.saveEvent(event);
